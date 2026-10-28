@@ -1,0 +1,27 @@
+name: Build macOS app
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install just
+        run: brew install just
+      - name: Build app
+        run: just build
+      - name: Zip app
+        run: ditto -c -k --sequesterRsrc --keepParent "build/RAM Monitor.app" "build/RAM Monitor.zip"
+      - name: Upload zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: RAM-Monitor-macOS-arm64
+          path: build/RAM Monitor.zip
+          if-no-files-found: error
